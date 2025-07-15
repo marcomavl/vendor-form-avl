@@ -3,12 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ແບບຟອມ Vendor</title>
-    <!-- Tailwind CSS CDN -->
+    <title>ແບບຟອມມອບວຽກ</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- jsPDF and html2canvas for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -31,7 +28,7 @@
             border-radius: 12px;
             position: relative; /* For absolute positioning of signature lines */
         }
-        input[type="text"], textarea {
+        input[type="text"], input[type="date"], textarea {
             border: 1px solid #e2e8f0;
             padding: 10px 12px;
             border-radius: 8px;
@@ -39,7 +36,7 @@
             box-sizing: border-box;
             transition: border-color 0.2s;
         }
-        input[type="text"]:focus, textarea:focus {
+        input[type="text"]:focus, input[type="date"]:focus, textarea:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
@@ -145,16 +142,13 @@
 </head>
 <body>
     <div id="form-content" class="a4-container flex flex-col space-y-6">
-        <!-- Header with Logo -->
         <div class="flex justify-between items-center mb-6">
             <div class="flex items-center space-x-4">
-                <!-- Logo is now linked directly from Imgur -->
                 <img id="logoPreview" src="https://i.imgur.com/6Dsdfqd.png" alt="ໂລໂກ້ Amari Vientiane" class="h-12 max-w-[150px] object-contain rounded-md">
             </div>
             <h1 class="text-3xl font-bold text-gray-800">ແບບຟອມມອບວຽກ</h1>
         </div>
 
-        <!-- Form Fields -->
         <div class="space-y-4">
             <div>
                 <label for="vendorName" class="block text-sm font-medium text-gray-700 mb-1">ລະບຸຊື່ບໍລິສັດ Vendor:</label>
@@ -164,7 +158,11 @@
             <div>
                 <label for="workDescription" class="block text-sm font-medium text-gray-700 mb-1">ລະບຸຊື່ ຫຼື ອະທິບາຍໜ້າວຽກ ຫຼື ບໍລິການ:</label>
                 <textarea id="workDescription" name="workDescription" rows="4" class="form-textarea" placeholder="ອະທິບາຍໜ້າວຽກ ຫຼື ບໍລິການ"></textarea>
-                <!-- Removed AI generation button -->
+            </div>
+
+            <div>
+                <label for="handoverDate" class="block text-sm font-medium text-gray-700 mb-1">ວັນທີສົ່ງມອບວຽກ:</label>
+                <input type="date" id="handoverDate" name="handoverDate" class="form-input">
             </div>
 
             <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-8">
@@ -204,7 +202,6 @@
             </div>
         </div>
 
-        <!-- Signature Areas -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">ພື້ນທີ່ເຊັນມອບວຽກ (ຈາກ Vendor):</label>
@@ -218,13 +215,11 @@
             </div>
         </div>
 
-        <!-- Buttons for PDF Generation -->
         <div class="flex justify-center space-x-4 mt-8" id="pdfButtonsContainer">
             <button onclick="generatePdf()" class="btn btn-primary" id="downloadPdfBtn">ດາວໂຫຼດ PDF</button>
         </div>
 
-        <!-- New Contact Information -->
-        <div class="text-center text-gray-600 text-sm pt-4 border-t border-gray-200" style="margin-top: 50px;">
+        <div class="text-center text-gray-600 text-sm pt-4 border-t border-gray-200" style="margin-top: 400px;">
             <p>Vientiane Grand Internship hotel co., ltd (Amari Vientiane Lao)</p>
             <p>Chao Fa Ngum road, Watchan village, Chanthabury district, Lao PDR</p>
             <p>M. +856 20 58 889 826 +856 20 54 685 999</p>
@@ -329,15 +324,10 @@
         // PDF Generation Logic
         async function generatePdf() {
             const formContent = document.getElementById('form-content');
-            const generateDescBtn = document.getElementById('generateDescBtn'); // This will be null now
             const clearSignatureButtons = document.querySelectorAll('.clear-signature-btn');
-            const pdfButtonsContainer = document.getElementById('pdfButtonsContainer'); // Get the container for PDF buttons
+            const pdfButtonsContainer = document.getElementById('pdfButtonsContainer'); 
 
             // Hide buttons before capturing for PDF
-            // Check if generateDescBtn exists before trying to hide it
-            if (generateDescBtn) {
-                generateDescBtn.style.display = 'none';
-            }
             clearSignatureButtons.forEach(btn => btn.style.display = 'none');
             pdfButtonsContainer.style.display = 'none'; // Hide the entire button container
 
@@ -367,12 +357,9 @@
 
             pdf.addImage(imgData, 'JPEG', (imgWidth - finalImgWidth) / 2, (pageHeight - finalImgHeight) / 2, finalImgWidth, finalImgHeight);
             
-            pdf.save('ແບບຟອມ Vendor.pdf');
+            pdf.save('ແບບຟອມມອບວຽກ.pdf'); // Changed filename to reflect new title
 
             // Restore visibility of buttons after PDF generation
-            if (generateDescBtn) { // Check if generateDescBtn exists before trying to restore it
-                generateDescBtn.style.display = 'flex'; // Restore as flex to maintain layout
-            }
             clearSignatureButtons.forEach(btn => btn.style.display = 'block'); // Restore as block
             pdfButtonsContainer.style.display = 'flex'; // Restore the entire button container
         }
