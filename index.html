@@ -351,13 +351,18 @@
             const formContent = document.getElementById('form-content');
             const clearSignatureButtons = document.querySelectorAll('.clear-signature-btn');
             const pdfButtonsContainer = document.getElementById('pdfButtonsContainer'); 
-            // Assuming generateDescBtn is added later. If not, this might throw an error.
-            // For now, commenting out until user adds it or confirms its presence.
-            // const generateDescBtn = document.getElementById('generateDescBtn');
+            
+            // Store original styles
+            const originalFormContentWidth = formContent.style.width;
+            const originalFormContentMaxWidth = formContent.style.maxWidth;
+            const originalBodyOverflow = document.body.style.overflow;
 
+            // Temporarily force desktop width and hide scrollbar
+            formContent.style.width = '1000px'; // A width that ensures desktop layout
+            formContent.style.maxWidth = '1000px'; // Prevent it from going beyond this
+            document.body.style.overflow = 'hidden'; // Hide scrollbars during capture
 
             // Hide buttons before capturing for PDF
-            // if (generateDescBtn) generateDescBtn.style.display = 'none';
             clearSignatureButtons.forEach(btn => btn.style.display = 'none');
             pdfButtonsContainer.style.display = 'none'; 
 
@@ -388,8 +393,12 @@
             
             pdf.save('ແບບຟອມ Vendor.pdf');
 
+            // Restore original styles after PDF generation
+            formContent.style.width = originalFormContentWidth;
+            formContent.style.maxWidth = originalFormContentMaxWidth;
+            document.body.style.overflow = originalBodyOverflow;
+
             // Restore visibility of buttons after PDF generation
-            // if (generateDescBtn) generateDescBtn.style.display = 'flex'; // Restore as flex to maintain layout
             clearSignatureButtons.forEach(btn => btn.style.display = 'block'); 
             pdfButtonsContainer.style.display = 'flex'; 
         }
