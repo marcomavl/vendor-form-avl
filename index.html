@@ -358,9 +358,9 @@
             const originalBodyOverflow = document.body.style.overflow;
 
             // Temporarily force desktop width and hide scrollbar
-            formContent.style.width = '1000px'; // A width that ensures desktop layout
-            formContent.style.maxWidth = '1000px'; // Prevent it from going beyond this
-            document.body.style.overflow = 'hidden'; // Hide scrollbars during capture
+            // Using a fixed pixel width that corresponds to A4 at 96 DPI (approx 210mm)
+            formContent.style.cssText += 'width: 794px !important; max-width: 794px !important; overflow: hidden !important;';
+            document.body.style.overflow = 'hidden'; // Hide body scrollbars to prevent layout shifts
 
             // Hide buttons before capturing for PDF
             clearSignatureButtons.forEach(btn => btn.style.display = 'none');
@@ -370,15 +370,15 @@
             const canvas = await html2canvas(formContent, {
                 scale: 1.5, // Adjusted scale for better quality and file size balance
                 useCORS: true, 
-                logging: true,
+                logging: false, // Set to false for cleaner console output
                 allowTaint: true 
             });
 
             const imgData = canvas.toDataURL('image/jpeg', 0.8); // Use JPEG for smaller file size, quality 0.8
             const pdf = new jsPDF('p', 'mm', 'a4'); 
 
-            const imgWidth = 210; 
-            const pageHeight = 297; 
+            const imgWidth = 210; // A4 width in mm
+            const pageHeight = 297; // A4 height in mm
             const imgHeight = canvas.height * imgWidth / canvas.width; 
 
             let finalImgWidth = imgWidth;
@@ -394,9 +394,9 @@
             pdf.save('ແບບຟອມ Vendor.pdf');
 
             // Restore original styles after PDF generation
-            formContent.style.width = originalFormContentWidth;
-            formContent.style.maxWidth = originalFormContentMaxWidth;
-            document.body.style.overflow = originalBodyOverflow;
+            formContent.style.cssText = originalFormContentWidth; // Restore original cssText
+            formContent.style.maxWidth = originalFormContentMaxWidth; // Restore original max-width
+            document.body.style.overflow = originalBodyOverflow; // Restore body overflow
 
             // Restore visibility of buttons after PDF generation
             clearSignatureButtons.forEach(btn => btn.style.display = 'block'); 
