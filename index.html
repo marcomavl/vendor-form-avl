@@ -29,7 +29,9 @@
             padding: 30px;
             box-sizing: border-box;
             border-radius: 12px;
-            position: relative; /* For absolute positioning of signature lines */
+            position: relative;
+            line-height: 1.6; /* Adjust line height for better readability */
+            font-size: 0.95rem; /* Slightly smaller base font for fitting */
         }
         input[type="text"], textarea {
             border: 1px solid #e2e8f0;
@@ -138,8 +140,9 @@
                 width: 100%;
                 padding: 20px;
             }
+            /* Override responsive radio group margin for consistent PDF layout */
             .radio-group label {
-                margin-right: 20px !important; /* Adjust for smaller screens */
+                margin-right: 1.5rem !important; /* Keep consistent spacing */
             }
         }
     </style>
@@ -167,11 +170,11 @@
                 <textarea id="workDescription" name="workDescription" rows="4" class="form-textarea" placeholder="ອະທິບາຍໜ້າວຽກ ຫຼື ບໍລິການ"></textarea>
             </div>
 
-            <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-8">
+            <div class="flex flex-row items-center space-x-8"> <!-- Changed from flex-col sm:flex-row to flex flex-row -->
                 <div class="mb-4 sm:mb-0">
                     <label class="block text-sm font-medium text-gray-700 mb-1">ມູນຄ່າ:</label>
                     <div class="flex items-center radio-group">
-                        <label class="mr-[80px]">
+                        <label class="mr-6"> <!-- Adjusted margin-right -->
                             <input type="radio" name="valueType" value="full" checked>
                             <span>ມູນຄ່າເຕັມ</span>
                         </label>
@@ -185,7 +188,7 @@
                     <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">ຈຳນວນ:</label>
                     <div class="flex items-center">
                         <input type="text" id="amount" name="amount" class="form-input flex-grow" placeholder="ປ້ອນຈຳນວນ">
-                        <div class="ml-3">
+                        <div class="ml-3 flex items-center"> <!-- Added flex and items-center here -->
                             <label class="inline-flex items-center mr-4">
                                 <input type="radio" name="currency" value="LAK" checked class="form-radio">
                                 <span class="ml-2 text-sm text-gray-700">LAK</span>
@@ -205,7 +208,7 @@
         </div>
 
         <!-- Signature Areas -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+        <div class="grid grid-cols-2 gap-8 mt-8"> <!-- Changed from md:grid-cols-2 to grid-cols-2 -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">ພື້ນທີ່ເຊັນມອບວຽກ (ຈາກ Vendor):</label>
                 <canvas id="vendorSignaturePad" class="signature-pad"></canvas>
@@ -235,7 +238,6 @@
 
             // Function to set canvas dimensions
             function setCanvasDimensions() {
-                // Set canvas width and height to match its displayed size
                 canvas.width = canvas.offsetWidth;
                 canvas.height = canvas.offsetHeight;
                 
@@ -326,66 +328,6 @@
             setupSignaturePad('amariSignaturePad');
         };
 
-        // Gemini API Integration: Generate Work Description
-        async function generateWorkDescription() {
-            const workDescriptionTextarea = document.getElementById('workDescription');
-            // Check if generateDescBtn exists before trying to access it
-            const generateDescBtn = document.getElementById('generateDescBtn');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-
-            const initialDescription = workDescriptionTextarea.value.trim();
-
-            if (!initialDescription) {
-                // Using a custom message box instead of alert()
-                showMessageBox('ກະລຸນາປ້ອນຄຳອະທິບາຍໜ້າວຽກເບື້ອງຕົ້ນກ່ອນ.', 'warning'); // Please enter an initial work description.
-                return;
-            }
-
-            // Show loading spinner and disable button only if the button exists
-            if (generateDescBtn) {
-                loadingSpinner.classList.remove('hidden');
-                generateDescBtn.disabled = true;
-                generateDescBtn.style.opacity = '0.7';
-            }
-
-            try {
-                let chatHistory = [];
-                const prompt = `ຂະຫຍາຍ ຫຼື ປັບປຸງຄຳອະທິບາຍໜ້າວຽກຕໍ່ໄປນີ້ໃຫ້ລະອຽດ ແລະ ເປັນທາງການຫຼາຍຂຶ້ນ, ໂດຍຮັກສາຄວາມໝາຍເດີມໄວ້. ໃຫ້ຄຳຕອບເປັນພາສາລາວເທົ່ານັ້ນ:\n\n${initialDescription}`;
-                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-                const payload = { contents: chatHistory };
-                const apiKey = ""; // Canvas will automatically provide the API key
-
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
-
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const generatedText = result.candidates[0].content.parts[0].text;
-                    workDescriptionTextarea.value = generatedText;
-                } else {
-                    console.error('ບໍ່ສາມາດສ້າງຄຳອະທິບາຍໜ້າວຽກໄດ້:', result); // Could not generate work description
-                    showMessageBox('ເກີດຂໍ້ຜິດພາດໃນການສ້າງຄຳອະທິບາຍໜ້າວຽກ. ກະລຸນາລອງໃໝ່ອີກຄັ້ງ.', 'error'); // An error occurred while generating the work description. Please try again.
-                }
-            } catch (error) {
-                console.error('Error calling Gemini API:', error);
-                showMessageBox('ເກີດຂໍ້ຜິດພາດໃນການເຊື່ອມຕໍ່ກັບ Gemini API. ກະລຸນາກວດສອບການເຊື່ອມຕໍ່ອິນເຕີເນັດຂອງທ່ານ.', 'error'); // An error occurred connecting to the Gemini API. Please check your internet connection.
-            } finally {
-                // Hide loading spinner and enable button only if the button exists
-                if (generateDescBtn) {
-                    loadingSpinner.classList.add('hidden');
-                    generateDescBtn.disabled = false;
-                    generateDescBtn.style.opacity = '1';
-                }
-            }
-        }
-
         // Custom Message Box Function (replaces alert)
         function showMessageBox(message, type = 'info') {
             const messageBox = document.createElement('div');
@@ -408,36 +350,38 @@
         async function generatePdf() {
             const formContent = document.getElementById('form-content');
             const clearSignatureButtons = document.querySelectorAll('.clear-signature-btn');
-            const pdfButtonsContainer = document.getElementById('pdfButtonsContainer'); // Get the container for PDF buttons
-            const generateDescBtn = document.getElementById('generateDescBtn'); // Ensure this is correctly referenced if it exists
+            const pdfButtonsContainer = document.getElementById('pdfButtonsContainer'); 
+            // Assuming generateDescBtn is added later. If not, this might throw an error.
+            // For now, commenting out until user adds it or confirms its presence.
+            // const generateDescBtn = document.getElementById('generateDescBtn');
+
 
             // Hide buttons before capturing for PDF
-            if (generateDescBtn) generateDescBtn.style.display = 'none';
+            // if (generateDescBtn) generateDescBtn.style.display = 'none';
             clearSignatureButtons.forEach(btn => btn.style.display = 'none');
-            pdfButtonsContainer.style.display = 'none'; // Hide the entire button container
+            pdfButtonsContainer.style.display = 'none'; 
 
             // Capture the form content as an image
             const canvas = await html2canvas(formContent, {
                 scale: 1.5, // Adjusted scale for better quality and file size balance
-                useCORS: true, // Required for images from external sources
+                useCORS: true, 
                 logging: true,
-                allowTaint: true // Allow tainted canvas for external images if needed
+                allowTaint: true 
             });
 
             const imgData = canvas.toDataURL('image/jpeg', 0.8); // Use JPEG for smaller file size, quality 0.8
-            const pdf = new jsPDF('p', 'mm', 'a4'); // 'p' for portrait, 'mm' for millimeters, 'a4' for A4 size
+            const pdf = new jsPDF('p', 'mm', 'a4'); 
 
-            const imgWidth = 210; // A4 width in mm
-            const pageHeight = 297; // A4 height in mm
-            const imgHeight = canvas.height * imgWidth / canvas.width; // Calculate image height based on A4 width and aspect ratio
+            const imgWidth = 210; 
+            const pageHeight = 297; 
+            const imgHeight = canvas.height * imgWidth / canvas.width; 
 
-            // If the captured image height is greater than A4 height, scale it down to fit one page
             let finalImgWidth = imgWidth;
             let finalImgHeight = imgHeight;
 
             if (finalImgHeight > pageHeight) {
                 finalImgHeight = pageHeight;
-                finalImgWidth = canvas.width * pageHeight / canvas.height; // Recalculate width to maintain aspect ratio
+                finalImgWidth = canvas.width * pageHeight / canvas.height; 
             }
 
             pdf.addImage(imgData, 'JPEG', (imgWidth - finalImgWidth) / 2, (pageHeight - finalImgHeight) / 2, finalImgWidth, finalImgHeight);
@@ -445,9 +389,9 @@
             pdf.save('ແບບຟອມ Vendor.pdf');
 
             // Restore visibility of buttons after PDF generation
-            if (generateDescBtn) generateDescBtn.style.display = 'flex'; // Restore as flex to maintain layout
-            clearSignatureButtons.forEach(btn => btn.style.display = 'block'); // Restore as block
-            pdfButtonsContainer.style.display = 'flex'; // Restore the entire button container
+            // if (generateDescBtn) generateDescBtn.style.display = 'flex'; // Restore as flex to maintain layout
+            clearSignatureButtons.forEach(btn => btn.style.display = 'block'); 
+            pdfButtonsContainer.style.display = 'flex'; 
         }
     </script>
 </body>
