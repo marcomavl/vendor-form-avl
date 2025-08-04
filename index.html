@@ -352,33 +352,45 @@
             const clearSignatureButtons = document.querySelectorAll('.clear-signature-btn');
             const pdfButtonsContainer = document.getElementById('pdfButtonsContainer'); 
             
-            // Store original styles
-            const originalFormContentWidth = formContent.style.width;
-            const originalFormContentMaxWidth = formContent.style.maxWidth;
-            const originalBodyOverflow = document.body.style.overflow;
+            // Create a clone of the form content
+            const formClone = formContent.cloneNode(true);
+            
+            // Apply desktop-specific styles to the clone
+            formClone.style.cssText = `
+                width: 794px !important; /* Fixed width for A4 at 96 DPI */
+                max-width: 794px !important;
+                position: absolute !important;
+                left: -9999px !important; /* Move off-screen */
+                top: -9999px !important;
+                overflow: hidden !important;
+                display: block !important; /* Ensure it's displayed for capture */
+            `;
+            // Ensure any responsive classes are overridden on the clone
+            formClone.querySelector('.flex-row.items-center.space-x-8').classList.remove('flex-col', 'sm:flex-row');
+            formClone.querySelector('.flex-row.items-center.space-x-8').classList.add('flex-row');
+            formClone.querySelector('.grid.grid-cols-2.gap-8.mt-8').classList.remove('grid-cols-1', 'md:grid-cols-2');
+            formClone.querySelector('.grid.grid-cols-2.gap-8.mt-8').classList.add('grid-cols-2');
 
-            // Temporarily force desktop width and hide scrollbar
-            // Using a fixed pixel width that corresponds to A4 at 96 DPI (approx 210mm)
-            formContent.style.cssText += 'width: 794px !important; max-width: 794px !important; overflow: hidden !important;';
-            document.body.style.overflow = 'hidden'; // Hide body scrollbars to prevent layout shifts
+            // Append clone to body
+            document.body.appendChild(formClone);
 
-            // Hide buttons before capturing for PDF
+            // Hide buttons on the original form before capturing for PDF
             clearSignatureButtons.forEach(btn => btn.style.display = 'none');
             pdfButtonsContainer.style.display = 'none'; 
 
-            // Capture the form content as an image
-            const canvas = await html2canvas(formContent, {
-                scale: 1.5, // Adjusted scale for better quality and file size balance
+            // Capture the form content from the clone
+            const canvas = await html2canvas(formClone, {
+                scale: 1.5, 
                 useCORS: true, 
-                logging: false, // Set to false for cleaner console output
+                logging: false, 
                 allowTaint: true 
             });
 
-            const imgData = canvas.toDataURL('image/jpeg', 0.8); // Use JPEG for smaller file size, quality 0.8
+            const imgData = canvas.toDataURL('image/jpeg', 0.8); 
             const pdf = new jsPDF('p', 'mm', 'a4'); 
 
-            const imgWidth = 210; // A4 width in mm
-            const pageHeight = 297; // A4 height in mm
+            const imgWidth = 210; 
+            const pageHeight = 297; 
             const imgHeight = canvas.height * imgWidth / canvas.width; 
 
             let finalImgWidth = imgWidth;
@@ -393,12 +405,10 @@
             
             pdf.save('ແບບຟອມ Vendor.pdf');
 
-            // Restore original styles after PDF generation
-            formContent.style.cssText = originalFormContentWidth; // Restore original cssText
-            formContent.style.maxWidth = originalFormContentMaxWidth; // Restore original max-width
-            document.body.style.overflow = originalBodyOverflow; // Restore body overflow
+            // Remove the clone after PDF generation
+            formClone.remove();
 
-            // Restore visibility of buttons after PDF generation
+            // Restore visibility of buttons on the original form after PDF generation
             clearSignatureButtons.forEach(btn => btn.style.display = 'block'); 
             pdfButtonsContainer.style.display = 'flex'; 
         }
