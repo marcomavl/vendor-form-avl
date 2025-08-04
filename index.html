@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ແບບຟອມມອບວຽກ</title>
+    <title>ແບບຟອມ Vendor</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- jsPDF and html2canvas for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -28,7 +31,7 @@
             border-radius: 12px;
             position: relative; /* For absolute positioning of signature lines */
         }
-        input[type="text"], input[type="date"], textarea {
+        input[type="text"], textarea {
             border: 1px solid #e2e8f0;
             padding: 10px 12px;
             border-radius: 8px;
@@ -36,7 +39,7 @@
             box-sizing: border-box;
             transition: border-color 0.2s;
         }
-        input[type="text"]:focus, input[type="date"]:focus, textarea:focus {
+        input[type="text"]:focus, textarea:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
@@ -47,7 +50,8 @@
             background-color: #f8fafc;
             cursor: crosshair;
             width: 100%;
-            height: 120px; /* Adjusted height for better drawing */
+            height: 200px; /* Increased height for better drawing experience */
+            touch-action: none; /* Prevents default touch actions like scrolling */
         }
         .signature-line {
             position: absolute;
@@ -142,27 +146,25 @@
 </head>
 <body>
     <div id="form-content" class="a4-container flex flex-col space-y-6">
+        <!-- Header with Logo -->
         <div class="flex justify-between items-center mb-6">
             <div class="flex items-center space-x-4">
+                <!-- Logo is now linked directly from Imgur -->
                 <img id="logoPreview" src="https://i.imgur.com/6Dsdfqd.png" alt="ໂລໂກ້ Amari Vientiane" class="h-12 max-w-[150px] object-contain rounded-md">
             </div>
-            <h1 class="text-3xl font-bold text-gray-800">ແບບຟອມມອບວຽກ</h1>
+            <h1 class="text-3xl font-bold text-gray-800">ແບບຟອມສົ່ງມອບວຽກ</h1>
         </div>
 
+        <!-- Form Fields -->
         <div class="space-y-4">
             <div>
-                <label for="vendorName" class="block text-sm font-medium text-gray-700 mb-1">ລະບຸຊື່ບໍລິສັດ Vendor:</label>
-                <input type="text" id="vendorName" name="vendorName" class="form-input py-8 text-xl" placeholder="ປ້ອນຊື່ບໍລິສັດ Vendor">
+                <label for="vendorName" class="block text-sm font-medium text-gray-700 mb-1">ລະບຸຊື່ບໍລິສັດ:</label>
+                <input type="text" id="vendorName" name="vendorName" class="form-input" placeholder="ປ້ອນຊື່ບໍລິສັດ Vendor">
             </div>
 
             <div>
                 <label for="workDescription" class="block text-sm font-medium text-gray-700 mb-1">ລະບຸຊື່ ຫຼື ອະທິບາຍໜ້າວຽກ ຫຼື ບໍລິການ:</label>
                 <textarea id="workDescription" name="workDescription" rows="4" class="form-textarea" placeholder="ອະທິບາຍໜ້າວຽກ ຫຼື ບໍລິການ"></textarea>
-            </div>
-
-            <div>
-                <label for="handoverDate" class="block text-sm font-medium text-gray-700 mb-1">ວັນທີສົ່ງມອບວຽກ:</label>
-                <input type="date" id="handoverDate" name="handoverDate" class="form-input">
             </div>
 
             <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-8">
@@ -202,6 +204,7 @@
             </div>
         </div>
 
+        <!-- Signature Areas -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">ພື້ນທີ່ເຊັນມອບວຽກ (ຈາກ Vendor):</label>
@@ -209,21 +212,15 @@
                 <button onclick="clearSignature('vendorSignaturePad')" class="btn btn-secondary mt-2 text-sm clear-signature-btn">ລຶບລາຍເຊັນ</button>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">ພື້ນທີ່ເຊັນຮັບວຽກ (Amari Vientiane):</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">ພື້ນທີ່ເຊັນຮັບມອບວຽກ (Amari Vientiane):</label>
                 <canvas id="amariSignaturePad" class="signature-pad"></canvas>
                 <button onclick="clearSignature('amariSignaturePad')" class="btn btn-secondary mt-2 text-sm clear-signature-btn">ລຶບລາຍເຊັນ</button>
             </div>
         </div>
 
+        <!-- Buttons for PDF Generation -->
         <div class="flex justify-center space-x-4 mt-8" id="pdfButtonsContainer">
             <button onclick="generatePdf()" class="btn btn-primary" id="downloadPdfBtn">ດາວໂຫຼດ PDF</button>
-        </div>
-
-        <div class="text-center text-gray-600 text-sm pt-4 border-t border-gray-200" style="margin-top: 200px;">
-            <p>Vientiane Grand Internship hotel co., ltd (Amari Vientiane Lao)</p>
-            <p>Chao Fa Ngum road, Watchan village, Chanthabury district, Lao PDR</p>
-            <p>M. +856 20 58 889 826 +856 20 54 685 999</p>
-            <p>Contact Person: Pele Xayasith Pholsena</p>
         </div>
     </div>
 
@@ -236,29 +233,37 @@
             const ctx = canvas.getContext('2d');
             let drawing = false;
 
-            // Set canvas size for better resolution
-            const scale = window.devicePixelRatio; // Get the device pixel ratio
-            canvas.width = canvas.offsetWidth * scale;
-            canvas.height = canvas.offsetHeight * scale;
-            ctx.scale(scale, scale);
+            // Function to set canvas dimensions
+            function setCanvasDimensions() {
+                // Set canvas width and height to match its displayed size
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+                
+                // Re-apply drawing styles after resizing
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.strokeStyle = '#000';
+            }
 
-            ctx.lineWidth = 2;
-            ctx.lineCap = 'round';
-            ctx.strokeStyle = '#000';
+            // Set initial dimensions
+            setCanvasDimensions();
+
+            // Add resize listener to update canvas dimensions
+            window.addEventListener('resize', setCanvasDimensions);
 
             function getMousePos(e) {
                 const rect = canvas.getBoundingClientRect();
                 return {
-                    x: (e.clientX - rect.left) / scale,
-                    y: (e.clientY - rect.top) / scale
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top
                 };
             }
 
             function getTouchPos(e) {
                 const rect = canvas.getBoundingClientRect();
                 return {
-                    x: (e.touches[0].clientX - rect.left) / scale,
-                    y: (e.touches[0].clientY - rect.top) / scale
+                    x: e.touches[0].clientX - rect.left,
+                    y: e.touches[0].clientY - rect.top
                 };
             }
 
@@ -321,13 +326,93 @@
             setupSignaturePad('amariSignaturePad');
         };
 
+        // Gemini API Integration: Generate Work Description
+        async function generateWorkDescription() {
+            const workDescriptionTextarea = document.getElementById('workDescription');
+            // Check if generateDescBtn exists before trying to access it
+            const generateDescBtn = document.getElementById('generateDescBtn');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+
+            const initialDescription = workDescriptionTextarea.value.trim();
+
+            if (!initialDescription) {
+                // Using a custom message box instead of alert()
+                showMessageBox('ກະລຸນາປ້ອນຄຳອະທິບາຍໜ້າວຽກເບື້ອງຕົ້ນກ່ອນ.', 'warning'); // Please enter an initial work description.
+                return;
+            }
+
+            // Show loading spinner and disable button only if the button exists
+            if (generateDescBtn) {
+                loadingSpinner.classList.remove('hidden');
+                generateDescBtn.disabled = true;
+                generateDescBtn.style.opacity = '0.7';
+            }
+
+            try {
+                let chatHistory = [];
+                const prompt = `ຂະຫຍາຍ ຫຼື ປັບປຸງຄຳອະທິບາຍໜ້າວຽກຕໍ່ໄປນີ້ໃຫ້ລະອຽດ ແລະ ເປັນທາງການຫຼາຍຂຶ້ນ, ໂດຍຮັກສາຄວາມໝາຍເດີມໄວ້. ໃຫ້ຄຳຕອບເປັນພາສາລາວເທົ່ານັ້ນ:\n\n${initialDescription}`;
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // Canvas will automatically provide the API key
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const generatedText = result.candidates[0].content.parts[0].text;
+                    workDescriptionTextarea.value = generatedText;
+                } else {
+                    console.error('ບໍ່ສາມາດສ້າງຄຳອະທິບາຍໜ້າວຽກໄດ້:', result); // Could not generate work description
+                    showMessageBox('ເກີດຂໍ້ຜິດພາດໃນການສ້າງຄຳອະທິບາຍໜ້າວຽກ. ກະລຸນາລອງໃໝ່ອີກຄັ້ງ.', 'error'); // An error occurred while generating the work description. Please try again.
+                }
+            } catch (error) {
+                console.error('Error calling Gemini API:', error);
+                showMessageBox('ເກີດຂໍ້ຜິດພາດໃນການເຊື່ອມຕໍ່ກັບ Gemini API. ກະລຸນາກວດສອບການເຊື່ອມຕໍ່ອິນເຕີເນັດຂອງທ່ານ.', 'error'); // An error occurred connecting to the Gemini API. Please check your internet connection.
+            } finally {
+                // Hide loading spinner and enable button only if the button exists
+                if (generateDescBtn) {
+                    loadingSpinner.classList.add('hidden');
+                    generateDescBtn.disabled = false;
+                    generateDescBtn.style.opacity = '1';
+                }
+            }
+        }
+
+        // Custom Message Box Function (replaces alert)
+        function showMessageBox(message, type = 'info') {
+            const messageBox = document.createElement('div');
+            messageBox.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg text-white z-50`;
+            if (type === 'error') {
+                messageBox.classList.add('bg-red-500');
+            } else if (type === 'warning') {
+                messageBox.classList.add('bg-yellow-500');
+            } else {
+                messageBox.classList.add('bg-blue-500');
+            }
+            messageBox.textContent = message;
+            document.body.appendChild(messageBox);
+            setTimeout(() => {
+                messageBox.remove();
+            }, 3000); // Message disappears after 3 seconds
+        }
+
         // PDF Generation Logic
         async function generatePdf() {
             const formContent = document.getElementById('form-content');
             const clearSignatureButtons = document.querySelectorAll('.clear-signature-btn');
-            const pdfButtonsContainer = document.getElementById('pdfButtonsContainer'); 
+            const pdfButtonsContainer = document.getElementById('pdfButtonsContainer'); // Get the container for PDF buttons
+            const generateDescBtn = document.getElementById('generateDescBtn'); // Ensure this is correctly referenced if it exists
 
             // Hide buttons before capturing for PDF
+            if (generateDescBtn) generateDescBtn.style.display = 'none';
             clearSignatureButtons.forEach(btn => btn.style.display = 'none');
             pdfButtonsContainer.style.display = 'none'; // Hide the entire button container
 
@@ -357,9 +442,10 @@
 
             pdf.addImage(imgData, 'JPEG', (imgWidth - finalImgWidth) / 2, (pageHeight - finalImgHeight) / 2, finalImgWidth, finalImgHeight);
             
-            pdf.save('ແບບຟອມມອບວຽກ.pdf'); // Changed filename to reflect new title
+            pdf.save('ແບບຟອມ Vendor.pdf');
 
             // Restore visibility of buttons after PDF generation
+            if (generateDescBtn) generateDescBtn.style.display = 'flex'; // Restore as flex to maintain layout
             clearSignatureButtons.forEach(btn => btn.style.display = 'block'); // Restore as block
             pdfButtonsContainer.style.display = 'flex'; // Restore the entire button container
         }
